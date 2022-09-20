@@ -1,122 +1,86 @@
-h1,
-h2,
-h5,
-h6,
-h7 {
-  font-family: "Gloria Hallelujah", cursive;
+function formatDate(date) {
+  let hours = date.getHours();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  let minutes = date.getMinutes();
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+
+  let dayIndex = date.getDay();
+  let days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let day = days[dayIndex];
+
+  return `${day} ${hours}:${minutes}`;
 }
 
-h1 {
-  margin-top: 10x;
-  margin-left: 30px;
+function displayWeatherCondition(response) {
+  document.querySelector("#city").innerHTML = response.data.name;
+  document.querySelector("#temperature").innerHTML = Math.round(
+    response.data.main.temp
+  );
+
+  document.querySelector("#humidity").innerHTML = response.data.main.humidity;
+  document.querySelector("#wind").innerHTML = Math.round(
+    response.data.wind.speed
+  );
+  document.querySelector("#description").innerHTML =
+    response.data.weather[0].main;
 }
 
-h7 {
-  font-size: 14px;
+function searchCity(city) {
+  let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayWeatherCondition);
 }
 
-p {
-  font-family: helvetica;
-  font-size: 13px;
+function handleSubmit(event) {
+  event.preventDefault();
+  let city = document.querySelector("#city-input").value;
+  searchCity(city);
 }
 
-img {
-  width: 300px;
-  margin: 20px auto;
-}
-svg {
-  width: 20px;
+function searchLocation(position) {
+  let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}&units=metric`;
+
+  axios.get(apiUrl).then(displayWeatherCondition);
 }
 
-li {
-  list-style: none;
-  font-family: helvetica;
-  font-size: 13px;
-  padding-left: 0px;
+function getCurrentLocation(event) {
+  event.preventDefault();
+  navigator.geolocation.getCurrentPosition(searchLocation);
 }
 
-ul {
-  padding-inline-start: 10px;
+function convertToFahrenheit(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  temperatureElement.innerHTML = 66;
 }
 
-.form {
-  display: flex;
-  margin-top: 30px;
+function convertToCelsius(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  temperatureElement.innerHTML = 19;
 }
 
-.form-control {
-  height: 36px;
-  width: 260px;
-  color: #949bbb;
-  border-radius: 0.6em;
-}
+let dateElement = document.querySelector("#date");
+let currentTime = new Date();
+dateElement.innerHTML = formatDate(currentTime);
 
-.container {
-  background: transparent;
-  display: block;
-  width: fit-content;
-  padding: 40px;
-  margin: 20px auto;
-  border-radius: 20px;
-  box-shadow: 2px 2px 20px 2px rgba(0, 0, 0, 0.1);
-}
+let searchForm = document.querySelector("#search-form");
+searchForm.addEventListener("submit", handleSubmit);
 
-.body2 {
-  margin-top: 30px;
-  max-width: 530px;
-  border-radius: 15px;
-  box-shadow: 2px 2px 15px 2px rgba(0, 0, 0, 0.1);
-}
+let currentLocationButton = document.querySelector("#current-location-button");
+currentLocationButton.addEventListener("click", getCurrentLocation);
 
-.body2 .row {
-  padding: 20px;
-}
-
-.col {
-  padding-left: 0;
-  margin-top: 20px;
-  position: relative;
-}
-
-.col-sm {
-  position: relative;
-  padding-top: 100px;
-  color: #364170;
-}
-
-.time {
-  margin-top: 40px;
-  margin-bottom: 5px;
-  padding: 10px;
-}
-
-.weather {
-  height: fit-content;
-}
-
-.card {
-  display: block;
-  margin-top: 0px;
-  width: 160px;
-  box-shadow: 2px 2px 15px 2px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-  height: 38px;
-  border-radius: 10px;
-  margin-top: 8px;
-  background-color: #8791be;
-  border-color: white;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  padding: 8px 15px;
-  text-align: center;
-  text-decoration: none;
-  transition: all 200ms ease;
-}
-
-.btn-primary:hover {
-  color: #fff;
-  background: #364170;
-}
+searchCity("New York");
